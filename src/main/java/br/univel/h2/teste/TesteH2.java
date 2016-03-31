@@ -41,7 +41,7 @@ public class TesteH2 {
 
 	private void abrirConexao() throws SQLException {
 
-		String url = "jdbc:h2:~/test";
+		String url = "jdbc:h2:C:/Users/ehdfreitas/Desktop/Banco de dados/agenda.db";
 		String user = "sa";
 		String pass = "sa";
 		con = DriverManager.getConnection(url, user, pass);
@@ -53,17 +53,21 @@ public class TesteH2 {
 	}
 
 	private void create() throws SQLException {
-		PreparedStatement ps = con
-				.prepareStatement("INSERT INTO PESSOA (ID, NOME) VALUES (?, ?)");
-		ps.setInt(1, 1);
-		ps.setString(2, "Hugo");
+		PreparedStatement ps = null; 
+		try {
+			ps = con.prepareStatement("INSERT INTO PESSOA (ID, NOME) VALUES (?, ?)"); // prepara a execução da sql
+			ps.setInt(1, 1);         // parametros
+			ps.setString(2, "Hugo"); // parametros
+			
+			int res = ps.executeUpdate(); // retorna quantos registros foram alterados.
+			
 		
-		int res = ps.executeUpdate();
+		} finally {
+			// Aqui não garante que executa o close. --- pode ocorrer algum erro executeUpdate() 
+			if (ps != null)
+			   ps.close();
+		}
 		
-		// Aqui não garante que executa o close.
-		ps.close();
-		
-		System.out.println(res + " registros alterados.");
 
 	}
 
@@ -76,13 +80,15 @@ public class TesteH2 {
 				st = con.createStatement();
 				result = st.executeQuery("SELECT * FROM PESSOA");
 				while (result.next()) {
-					int id = result.getInt(1);
-					String nome = result.getString("nome");
+					int id = result.getInt(1);              /* busca por numero da coluna */
+					String nome = result.getString("nome"); /* busca pelo nome da coluna */
 					System.out.println(id + " " + nome);
 				}
 			} finally {
-				if (st != null) st.close();
-				if (result != null) result.close();
+				if (st != null)
+					st.close();
+				if (result != null)
+					result.close();
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
